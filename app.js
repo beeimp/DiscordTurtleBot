@@ -13,6 +13,7 @@ client.on('message', msg=>{
         {word: 'Hello', answer: "Hello~"},
         {word: 'hello', answer: "Hello~"},
         {word: '야', answer: "왜"},
+        {word: '거북아', answer: "왜"},
         {word: "안녕", answer: "안녕!ㅎㅎ"}
     ];
 
