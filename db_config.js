@@ -17,20 +17,34 @@ connection.connect((err) => {
     console.log('connected as id ' + connection.threadId);
 });
 
+// db와 서버 연결 끊김 현상 해결 code
+function handleDisconnect() {
+    connection.connect(function(err) {            
+      if(err) {                            
+        console.log('error when connecting to db:', err);
+        setTimeout(handleDisconnect, 2000); 
+      }                                   
+    });                                 
+  }
+
+// chatting table 생성
 function createTableChatting() {
     connection.query('CREATE TABLE `chatting`(`c_id` int AUTO_INCREMENT PRIMARY KEY, `author` CHAR(20), `message` TEXT, `created_at` DATETIME)')
 }
 
+// answers table 생성
 function createTableAnswer() {
     connection.query('CREATE TABLE `answers`(`answers_id` int AUTO_INCREMENT PRIMARY KEY, `author` CHAR(20), `word` CHAR(200), `answer` CHAR(200), `created_at` DATETIME)')
 }
 
+// chatting table에 내용추가
 function insertChatting(values) {
     connection.query('INSERT INTO chatting (author, message, created_at) VALUES (?, ?, ?)', values, (err, results, fields) => {
         if (err) throw err;
     })
 }
 
+// bot의 답변을 db에서 검색
 function searchAnswer(msg) {
     connection.query('SELECT answer FROM answers WHERE word = ?', msg.content, (err, result, fields) => {
         if (err) throw err;
@@ -41,6 +55,7 @@ function searchAnswer(msg) {
     })
 }
 
+// bot 물음 추가
 function insertAnswer(msg) {
     const content = msg.content.split(' ');
     if (content.length === 3) {
@@ -65,6 +80,8 @@ function insertAnswer(msg) {
         msg.reply('양식이 틀렸어요! (!추가 <질문> <답변>)');
     }
 }
+
+// bot 물음 수정
 function updateAnswer(msg) {
     const content = msg.content.split(' ');
     if (content.length === 3) {
@@ -87,6 +104,8 @@ function updateAnswer(msg) {
         msg.reply('양식이 틀렸어요! (!수정 <질문> <답변>)');
     }
 }
+
+module.exports.HandleDisconnect = handleDisconnect;
 
 module.exports.CreateTableChatting = createTableChatting;
 module.exports.CreateTableAnswer = createTableAnswer;
