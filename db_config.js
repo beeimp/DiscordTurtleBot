@@ -19,13 +19,13 @@ connection.connect((err) => {
 
 // db와 서버 연결 끊김 현상 해결 code
 function handleDisconnect() {
-    connection.connect(function(err) {            
-      if(err) {                            
-        console.log('error when connecting to db:', err);
-        setTimeout(handleDisconnect, 2000); 
-      }                                   
-    });                                 
-  }
+    connection.connect(function (err) {
+        if (err) {
+            console.log('error when connecting to db:', err);
+            setTimeout(handleDisconnect, 2000);
+        }
+    });
+}
 
 // chatting table 생성
 function createTableChatting() {
@@ -85,21 +85,26 @@ function insertAnswer(msg) {
 function updateAnswer(msg) {
     const content = msg.content.split(' ');
     if (content.length === 3) {
-        connection.query('SELECT * from answers WHERE word = ?', [content[1]], (err, result, fields) => {
-            if (err) throw err;
-            if (result && result.length) {
-                connection.query(
-                    'UPDATE answers SET author = ?, word = ?, answer = ?, created_at = ? WHERE word = ?',
-                    [msg.author.username, content[1], content[2], new Date(msg.createdTimestamp), content[1]],
-                    (err, results, fields) => {
-                        if (err) throw err;
-                        else{
-                            msg.reply(`수정했습니다. ( 질문 : ${content[1]} / 답변 : ${content[2]} )`)
-                        }
-                    })
-            } else {
-            }
-        })
+        if (content[1][0] === '!') {
+            msg.reply('명령어는 수정할 수 없습니다!');
+        }
+        else {
+            connection.query('SELECT * from answers WHERE word = ?', [content[1]], (err, result, fields) => {
+                if (err) throw err;
+                if (result && result.length) {
+                    connection.query(
+                        'UPDATE answers SET author = ?, word = ?, answer = ?, created_at = ? WHERE word = ?',
+                        [msg.author.username, content[1], content[2], new Date(msg.createdTimestamp), content[1]],
+                        (err, results, fields) => {
+                            if (err) throw err;
+                            else {
+                                msg.reply(`수정했습니다. ( 질문 : ${content[1]} / 답변 : ${content[2]} )`)
+                            }
+                        })
+                } else {
+                }
+            })
+        }
     } else {
         msg.reply('양식이 틀렸어요! (!수정 <질문> <답변>)');
     }

@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/kogi9231/DiscordTurtleBot#readme",
   "dependencies": {
+    "@discordjs/opus": "^0.3.3",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "mysql": "^2.18.1",
