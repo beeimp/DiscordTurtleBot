@@ -35,7 +35,7 @@ client.on('message', msg => {
             msg.member.voice.channel.join()
             .then(connection => {
                 msg.reply("재생할게!");
-                let dispatcher = connection.play(`./static/music/IZONE-Panorama.mp3`, {seek:1, volume: 0.1});
+                let dispatcher = connection.play(`./static/music/IZONE-Panorama_teaser.mp3`, {seek:1, volume: 0.1});
                 dispatcher.on("end", end=>{});
             })
             .catch(console.error);
