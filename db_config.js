@@ -17,15 +17,10 @@ connection.connect((err) => {
     console.log('connected as id ' + connection.threadId);
 });
 
-// db와 서버 연결 끊김 현상 해결 code
-function handleDisconnect() {
-    connection.connect(function (err) {
-        if (err) {
-            console.log('error when connecting to db:', err);
-            setTimeout(handleDisconnect, 2000);
-        }
-    });
-}
+// db 끊김 방지
+setInterval(function () {
+    connection.query('SELECT 1');
+}, 5000);
 
 // chatting table 생성
 function createTableChatting() {
@@ -110,7 +105,6 @@ function updateAnswer(msg) {
     }
 }
 
-module.exports.HandleDisconnect = handleDisconnect;
 
 module.exports.CreateTableChatting = createTableChatting;
 module.exports.CreateTableAnswer = createTableAnswer;
