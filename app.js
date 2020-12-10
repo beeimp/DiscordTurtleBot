@@ -11,9 +11,16 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     // db에 메시지 저장
-    console.log(msg);
+    // console.log(msg);
     if (msg.author.id !== '779613987004219402') { // 봇에 대한 채팅은 필터링
-        db.InsertChatting([msg.author.username, msg.content, new Date(msg.createdTimestamp)]);
+        db.InsertChatting(msg);
+
+        if(msg.embeds[0] && msg.embeds[0].type === 'link'){
+            db.InsertLink(msg);
+        }
+        if(msg.attachments && msg.attachments.toJSON()[0]){
+            db.InsertFiles(msg);
+        }
     }
     Math.random
     if (msg.content === '!전체삭제') {

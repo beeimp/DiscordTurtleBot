@@ -1,6 +1,9 @@
 const mysql = require('mysql');
 require('dotenv').config();
 
+const axios = require('axios').default;
+const fs = require('fs')
+
 const connection = mysql.createConnection({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -22,21 +25,58 @@ setInterval(function () {
     connection.query('SELECT 1');
 }, 5000);
 
-// chatting table 생성
-function createTableChatting() {
-    connection.query('CREATE TABLE `chatting`(`c_id` int AUTO_INCREMENT PRIMARY KEY, `author` CHAR(20), `message` TEXT, `created_at` DATETIME)')
-}
-
-// answers table 생성
-function createTableAnswer() {
-    connection.query('CREATE TABLE `answers`(`answers_id` int AUTO_INCREMENT PRIMARY KEY, `author` CHAR(20), `word` CHAR(200), `answer` CHAR(200), `created_at` DATETIME)')
-}
-
 // chatting table에 내용추가
-function insertChatting(values) {
+function insertChatting(msg) {
+    const values = [msg.author.id, msg.content, new Date(msg.createdTimestamp)];
     connection.query('INSERT INTO chatting (author, message, created_at) VALUES (?, ?, ?)', values, (err, results, fields) => {
         if (err) throw err;
     })
+}
+
+// 채팅에서 link 추가
+function insertLink(msg){
+    const linkImformation = msg.embeds[0]
+    // const values = [msg.author.id, linkImformation.title, linkImformation.description, linkImformation.url, new Date(msg.createdTimestamp)];
+    // connection.query(
+    //     'INSERT INTO links (author, title, description, url, create_at) VALUES (?, ?, ?, ?, ?)',
+    //     values,
+    //     (err, results, fields) => {
+    //         if (err) throw err;
+    //     });
+}
+// local에 파일 추가 및 files table에 데이터 추가
+async function insertFiles(msg){
+    const fileImformation = msg.attachments.toJSON()[0];
+    let type_ = "";
+    switch(`.${fileImformation.name.split(".")[1]}`){
+        case ".jpg":
+        case ".png":
+        case ".jpeg":
+        case ".svg":
+        case ".gif":
+            type_ = "images";
+            break;
+        case ".mp3":
+            type_ = "musics";
+            break;
+        default:
+            type_ = "others";
+    }
+
+    await axios.get(fileImformation.url, {
+        responseType: "stream"
+    }).then((response)=>{
+        response.data.pipe(fs.createWriteStream(`./static/${type_}/${fileImformation.name}`))
+    
+        
+    })
+    const values = [msg.author.id, fileImformation.name, type_, new Date(msg.createdTimestamp)];
+    connection.query(
+        'INSERT INTO files (author, name, type, create_at) VALUES (?, ?, ?, ?)',
+        values,
+        (err, results, fields) => {
+            if (err) throw err;
+        });
 }
 
 // bot의 답변을 db에서 검색
@@ -61,7 +101,7 @@ function insertAnswer(msg) {
             } else {
                 connection.query(
                     'INSERT INTO answers (author, word, answer, created_at) VALUES (?, ?, ?, ?)',
-                    [msg.author.username, content[1], content[2], new Date(msg.createdTimestamp)],
+                    [msg.author.id, content[1], content[2], new Date(msg.createdTimestamp)],
                     (err, results, fields) => {
                         if (err) {
                             throw err;
@@ -89,7 +129,7 @@ function updateAnswer(msg) {
                 if (result && result.length) {
                     connection.query(
                         'UPDATE answers SET author = ?, word = ?, answer = ?, created_at = ? WHERE word = ?',
-                        [msg.author.username, content[1], content[2], new Date(msg.createdTimestamp), content[1]],
+                        [msg.author.id, content[1], content[2], new Date(msg.createdTimestamp), content[1]],
                         (err, results, fields) => {
                             if (err) throw err;
                             else {
@@ -105,10 +145,9 @@ function updateAnswer(msg) {
     }
 }
 
-
-module.exports.CreateTableChatting = createTableChatting;
-module.exports.CreateTableAnswer = createTableAnswer;
 module.exports.SearchAnswer = searchAnswer;
 module.exports.InsertChatting = insertChatting;
+module.exports.InsertLink = insertLink;
+module.exports.InsertFiles = insertFiles;
 module.exports.InsertAnswer = insertAnswer;
 module.exports.UpdateAnswer = updateAnswer;
