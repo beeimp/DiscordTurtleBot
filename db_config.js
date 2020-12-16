@@ -66,7 +66,7 @@ async function insertFiles(msg) {
     await axios.get(fileImformation.url, {
         responseType: "stream"
     }).then((response) => {
-        response.data.pipe(fs.createWriteStream(`./static/${type_}/${new Date(msg.createdTimestamp)}_${fileImformation.name}`))
+        response.data.pipe(fs.createWriteStream(`./static/${type_}/${msg.createdTimestamp}_${fileImformation.name}`))
 
 
     })
