@@ -27,14 +27,14 @@ setInterval(function () {
 
 // chatting table에 내용추가
 function insertChatting(msg) {
-    const values = [msg.author.id, msg.content, new Date(msg.createdTimestamp)];
-    connection.query('INSERT INTO chatting (author, message, created_at) VALUES (?, ?, ?)', values, (err, results, fields) => {
+    const values = [msg.author.id, msg.author.username, msg.guild.name, msg.channel.name, msg.content, new Date(msg.createdTimestamp)];
+    connection.query('INSERT INTO chatting (author_id, author, guild, channel, message, created_at) VALUES (?, ?, ?, ?, ?, ?)', values, (err, results, fields) => {
         if (err) throw err;
     })
 }
 
 // 채팅에서 link 추가
-function insertLink(msg){
+function insertLink(msg) {
     const linkImformation = msg.embeds[0]
     // const values = [msg.author.id, linkImformation.title, linkImformation.description, linkImformation.url, new Date(msg.createdTimestamp)];
     // connection.query(
@@ -45,10 +45,10 @@ function insertLink(msg){
     //     });
 }
 // local에 파일 추가 및 files table에 데이터 추가
-async function insertFiles(msg){
+async function insertFiles(msg) {
     const fileImformation = msg.attachments.toJSON()[0];
     let type_ = "";
-    switch(`.${fileImformation.name.split(".")[1]}`){
+    switch (`.${fileImformation.name.split(".")[1]}`) {
         case ".jpg":
         case ".png":
         case ".jpeg":
@@ -65,14 +65,14 @@ async function insertFiles(msg){
 
     await axios.get(fileImformation.url, {
         responseType: "stream"
-    }).then((response)=>{
-        response.data.pipe(fs.createWriteStream(`./static/${type_}/${fileImformation.name}`))
-    
-        
+    }).then((response) => {
+        response.data.pipe(fs.createWriteStream(`./static/${type_}/${new Date(msg.createdTimestamp)}_${fileImformation.name}`))
+
+
     })
-    const values = [msg.author.id, fileImformation.name, type_, new Date(msg.createdTimestamp)];
+    const values = [msg.author.id, msg.author.username, msg.guild.name, msg.channel.name, fileImformation.name, type_, new Date(msg.createdTimestamp)];
     connection.query(
-        'INSERT INTO files (author, name, type, create_at) VALUES (?, ?, ?, ?)',
+        'INSERT INTO files (author_id, author, guild, channel, name,  extension, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
         values,
         (err, results, fields) => {
             if (err) throw err;
@@ -92,7 +92,32 @@ function searchAnswer(msg) {
 
 // bot 물음 추가
 function insertAnswer(msg) {
-    const content = msg.content.split(' ');
+    const msgContent = msg.content;
+    let content = [msgContent.substr(0, 4)];
+    const symbol = msgContent.indexOf("'") > 0 ? "'" : msgContent.indexOf('"') > 0 ? '"' : msgContent.indexOf('`') > 0 ? '`' : '-1';
+    if (symbol != '-1') {
+        let flag = false;
+        let temp = '';
+        for (let i = 4; i < msgContent.length; i++) {
+            let msgContentChar = msgContent.charAt(i);
+            if (msgContentChar == symbol) {
+                if (flag) {
+                    flag = false;
+                    content.push(temp)
+                    temp = '';
+                } else {
+                    flag = true;
+                }
+                continue;
+            }
+            if (flag) {
+                temp = temp.concat(msgContentChar);
+            }
+        }
+    } else {
+        content = msgContent.split(' ');
+    }
+
     if (content.length === 3) {
         connection.query('SELECT * from answers WHERE word = ?', [content[1]], (err, result, fields) => {
             if (err) throw err;
@@ -100,8 +125,8 @@ function insertAnswer(msg) {
                 msg.reply('이미 등록된 질문입니다!');
             } else {
                 connection.query(
-                    'INSERT INTO answers (author, word, answer, created_at) VALUES (?, ?, ?, ?)',
-                    [msg.author.id, content[1], content[2], new Date(msg.createdTimestamp)],
+                    'INSERT INTO answers (author_id, author, guild, channel, word, answer, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [msg.author.id, msg.author.username, msg.guild.name, msg.channel.name, content[1], content[2], new Date(msg.createdTimestamp)],
                     (err, results, fields) => {
                         if (err) {
                             throw err;
@@ -118,7 +143,31 @@ function insertAnswer(msg) {
 
 // bot 물음 수정
 function updateAnswer(msg) {
-    const content = msg.content.split(' ');
+    const msgContent = msg.content;
+    let content = [msgContent.substr(0, 4)];
+    const symbol = msgContent.indexOf("'") > 0 ? "'" : msgContent.indexOf('"') > 0 ? '"' : msgContent.indexOf('`') > 0 ? '`' : '-1';
+    if (symbol != '-1') {
+        let flag = false;
+        let temp = '';
+        for (let i = 4; i < msgContent.length; i++) {
+            let msgContentChar = msgContent.charAt(i);
+            if (msgContentChar == symbol) {
+                if (flag) {
+                    flag = false;
+                    content.push(temp)
+                    temp = '';
+                } else {
+                    flag = true;
+                }
+                continue;
+            }
+            if (flag) {
+                temp = temp.concat(msgContentChar);
+            }
+        }
+    } else {
+        content = msgContent.split(' ');
+    }
     if (content.length === 3) {
         if (content[1][0] === '!') {
             msg.reply('명령어는 수정할 수 없습니다!');
