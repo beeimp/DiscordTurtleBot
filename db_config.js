@@ -84,7 +84,8 @@ function searchAnswer(msg) {
     connection.query('SELECT answer FROM answers WHERE word = ?', msg.content, (err, result, fields) => {
         if (err) throw err;
         if (result.length > 0 && result[0].answer) {
-            const answer = result[0].answer;
+            const randInt = Math.floor(Math.random() * result.length);
+            const answer = result[randInt].answer;
             msg.reply(answer);
         }
     })
@@ -119,23 +120,16 @@ function insertAnswer(msg) {
     }
 
     if (content.length === 3) {
-        connection.query('SELECT * from answers WHERE word = ?', [content[1]], (err, result, fields) => {
-            if (err) throw err;
-            if (result && result.length) {
-                msg.reply('이미 등록된 질문입니다!');
-            } else {
-                connection.query(
-                    'INSERT INTO answers (author_id, author, guild, channel, word, answer, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [msg.author.id, msg.author.username, msg.guild.name, msg.channel.name, content[1], content[2], new Date(msg.createdTimestamp)],
-                    (err, results, fields) => {
-                        if (err) {
-                            throw err;
-                        } else {
-                            msg.reply(`하나 배웠습니다!. ( 질문 : ${content[1]} / 답변 : ${content[2]} )`)
-                        }
-                    })
-            }
-        })
+        connection.query(
+            'INSERT INTO answers (author_id, author, guild, channel, word, answer, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [msg.author.id, msg.author.username, msg.guild.name, msg.channel.name, content[1], content[2], new Date(msg.createdTimestamp)],
+            (err, results, fields) => {
+                if (err) {
+                    throw err;
+                } else {
+                    msg.reply(`하나 배웠습니다!. ( 질문 : ${content[1]} / 답변 : ${content[2]} )`)
+                }
+            })
     } else {
         msg.reply('양식이 틀렸어요! (!추가 <질문> <답변>)');
     }
@@ -168,21 +162,21 @@ function updateAnswer(msg) {
     } else {
         content = msgContent.split(' ');
     }
-    if (content.length === 3) {
+    if (content.length === 4) {
         if (content[1][0] === '!') {
             msg.reply('명령어는 수정할 수 없습니다!');
         }
         else {
-            connection.query('SELECT * from answers WHERE word = ?', [content[1]], (err, result, fields) => {
+            connection.query('SELECT * from answers WHERE word = ? AND answer = ?', [content[1], content[2]], (err, result, fields) => {
                 if (err) throw err;
                 if (result && result.length) {
                     connection.query(
-                        'UPDATE answers SET author = ?, word = ?, answer = ?, created_at = ? WHERE word = ?',
-                        [msg.author.id, content[1], content[2], new Date(msg.createdTimestamp), content[1]],
+                        'UPDATE answers SET author = ?, word = ?, answer = ?, created_at = ? WHERE word = ? AND answer = ?',
+                        [msg.author.id, content[1], content[3], new Date(msg.createdTimestamp), content[1], content[2]],
                         (err, results, fields) => {
                             if (err) throw err;
                             else {
-                                msg.reply(`수정했습니다. ( 질문 : ${content[1]} / 답변 : ${content[2]} )`)
+                                msg.reply(`수정했습니다. ( 질문 : ${content[1]} / 답변 : ${content[2]} / 수정답변 ${content[3]} )`)
                             }
                         })
                 } else {
@@ -190,7 +184,7 @@ function updateAnswer(msg) {
             })
         }
     } else {
-        msg.reply('양식이 틀렸어요! (!수정 <질문> <답변>)');
+        msg.reply('양식이 틀렸어요! (!수정 "질문" "답변" "수정할답변")');
     }
 }
 
