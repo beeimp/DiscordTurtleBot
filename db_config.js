@@ -36,13 +36,13 @@ function insertChatting(msg) {
 // 채팅에서 link 추가
 function insertLink(msg) {
     const linkImformation = msg.embeds[0]
-    // const values = [msg.author.id, linkImformation.title, linkImformation.description, linkImformation.url, new Date(msg.createdTimestamp)];
-    // connection.query(
-    //     'INSERT INTO links (author, title, description, url, create_at) VALUES (?, ?, ?, ?, ?)',
-    //     values,
-    //     (err, results, fields) => {
-    //         if (err) throw err;
-    //     });
+    const values = [msg.author.id, msg.author.name, msg.guild.id, msg.channel.id, linkImformation.title, linkImformation.description, linkImformation.url, new Date(msg.createdTimestamp)];
+    connection.query(
+        'INSERT INTO links (author_id, author, guild, channel, title, description, url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        values,
+        (err, results, fields) => {
+            if (err) throw err;
+        });
 }
 // local에 파일 추가 및 files table에 데이터 추가
 async function insertFiles(msg) {
@@ -87,6 +87,20 @@ function searchAnswer(msg) {
             const randInt = Math.floor(Math.random() * result.length);
             const answer = result[randInt].answer;
             msg.reply(answer);
+        }
+    })
+}
+
+// 링크 검색
+function searchLink(msg){
+    connection.query('SELECT url FROM links ORDER BY link_id DESC', (err, result, fields) => {
+        if (err) throw err;
+        if (result.length > 0 && result[0].url) {
+            for(let i = 0; i < result.length; i++){
+                msg.channel.send(result[i].url);
+                
+                console.log(result[i].url);
+            }
         }
     })
 }
@@ -188,9 +202,19 @@ function updateAnswer(msg) {
     }
 }
 
+function deleteAnswer(msg){
+    const word = msg.content.slice(4)
+    connection.query('DELETE FROM answers WHERE word = ?', word, (err, result, fields)=>{
+        if (err) throw err;
+        msg.channel.send(`"${word}"에 대한 답변을 모두 삭제했어.`);
+    } )
+}
+
 module.exports.SearchAnswer = searchAnswer;
+module.exports.SearchLink = searchLink;
 module.exports.InsertChatting = insertChatting;
 module.exports.InsertLink = insertLink;
 module.exports.InsertFiles = insertFiles;
 module.exports.InsertAnswer = insertAnswer;
 module.exports.UpdateAnswer = updateAnswer;
+module.exports.DeleteAnswer = deleteAnswer;

@@ -14,7 +14,7 @@ client.on('message', msg => {
     // console.log(msg);
     if (msg.author.id !== '779613987004219402') { // 봇에 대한 채팅은 필터링
         db.InsertChatting(msg);
-
+        
         if (msg.embeds[0] && msg.embeds[0].type === 'link') {
             db.InsertLink(msg);
         }
@@ -30,7 +30,7 @@ client.on('message', msg => {
     })
 
     if (msg.author.id !== '779613987004219402') {
-        if (msg.content === '!전체삭제' && (msg.author.id === '373793790034706439' || msg.author.id === '425972339679690752') ) {
+        if (msg.content === '!전체삭제' && (msg.author.id === '373793790034706439' || msg.author.id === '425972339679690752')) {
             const channelName = msg.channel.name;
             msg.channel.delete()
 
@@ -48,23 +48,43 @@ client.on('message', msg => {
             msg.channel.send(content);
         } else if (msg.content.startsWith("!삭제")) {
             if (msg.content && msg.content.split(" ")[1]) {
-                let num = parseInt(msg.content.split(" ")[1]);
-                if (num > 100) {
-                    msg.reply('그만큼은 힘들어.. 안지울래..');
-                } else {
-                    msg.channel.bulkDelete(num);
+                const command = msg.content.slice(4);
+                const regex = /(\d)$/
+                if(regex.test(command)){
+                    let num = parseInt(msg.content.split(" ")[1]);
+                    if (num > 100) {
+                        msg.reply('그만큼은 힘들어.. 안지울래..');
+                    } else {
+                        msg.channel.bulkDelete(num);
+                    }
+                }else{
+                    db.DeleteAnswer(msg);
                 }
             }
         } else if (msg.content.startsWith('!추가')) {
-            db.InsertAnswer(msg);
+            // db.InsertAnswer(msg);
+            const answers = [
+                '추가 안해줄건데~~ㅋㅋ',
+                '니 말 안들을거야',
+                '뭐래 ㅋㅋ'
+            ];
+            randInt = Math.floor(Math.random() * answers.length);
+            msg.reply(answers[randInt]);
         } else if (msg.content.startsWith('!수정')) {
-            db.UpdateAnswer(msg);
+            // db.UpdateAnswer(msg);
+            const answers = [
+                '수정 안해줄건데~~ㅋㅋ',
+                '니 말 안들을거야',
+                '뭐래 ㅋㅋ'
+            ];
+            randInt = Math.floor(Math.random() * answers.length);
+            msg.reply(answers[randInt]);
         } else if (msg.content.startsWith("!재생 방송켜줘")) {
             if (msg.member.voice.channel) {
                 msg.member.voice.channel.join()
                     .then(connection => {
                         let dispatcher = connection.play(`./static/musics/방송켜줘.mp3`, { seek: 0, volume: 0.5 });
-                        dispatcher.on("end", end => { });
+                        dispatcher.on("end", end => {});
                     })
                     .catch(console.error);
             } else {
@@ -73,16 +93,28 @@ client.on('message', msg => {
         } else if (msg.content === '!나가') {
             msg.member.voice.channel.leave();
         } else if (msg.content === '!네이버실검' || msg.content === '!실시간' || msg.content === '!실검' || msg.content === '!실시간검색어') {
-            naverRankingInfo().then( values => {
+            naverRankingInfo().then(values => {
                 let messages = ['-----네이버 실시간 Top20-----'];
-                values.forEach((v)=>{
+                values.forEach((v) => {
                     messages.push(`${v.rank}위 : ${v.title}`)
-                } )
+                })
                 msg.channel.send(messages.join('\n'));
             });
 
-        } else if (msg.content.startsWith('거북아') && msg.content.split(" ").length > 1){
-            const answers = ['아니', '싫어. 몰라', '몰라', '귀찮아', 'ㅅㄲㄹㅇ', 'ㅁㄹ', '시끄러워', '귀찮게 하지마...', '나 예민하니까 건들지마' ];
+        } else if(msg.content === '!링크' || msg.content === '!최근링크'){
+            db.SearchLink(msg);
+        } else if (msg.content.startsWith('거북아') && msg.content.split(" ").length > 1) {
+            const answers = [
+                '아니',
+                '싫어. 몰라', 
+                '몰라', 
+                '귀찮아', 
+                'ㅅㄲㄹㅇ', 
+                'ㅁㄹ', 
+                '시끄러워', 
+                '귀찮게 하지마...', 
+                '나 예민하니까 건들지마', 
+                '말걸지마'];
             randInt = Math.floor(Math.random() * answers.length);
             msg.reply(answers[randInt]);
         } else {
