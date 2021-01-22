@@ -22,7 +22,7 @@ client.on('message', msg => {
             db.InsertFiles(msg);
         }
     }
-    const BadLanguage = ["섹", "섹스", "쉑"];
+    const BadLanguage = ["섹", "세엑스", "섹스", "쉑", "색", "색스", "새엑스", "세액스", "새액스", "쎅스"];
     BadLanguage.forEach(v => {
         if (msg.content === v) {
             msg.channel.bulkDelete(1);
@@ -62,23 +62,29 @@ client.on('message', msg => {
                 }
             }
         } else if (msg.content.startsWith('!추가')) {
-            // db.InsertAnswer(msg);
-            const answers = [
-                '추가 안해줄건데~~ㅋㅋ',
-                '니 말 안들을거야',
-                '뭐래 ㅋㅋ'
-            ];
-            randInt = Math.floor(Math.random() * answers.length);
-            msg.reply(answers[randInt]);
+            if(msg.author.id === '373793790034706439'){
+                db.InsertAnswer(msg);
+            } else{
+                const answers = [
+                    '추가 안해줄건데~~ㅋㅋ',
+                    '니 말 안들을거야',
+                    '뭐래 ㅋㅋ'
+                ];
+                randInt = Math.floor(Math.random() * answers.length);
+                msg.reply(answers[randInt]);
+            }
         } else if (msg.content.startsWith('!수정')) {
-            // db.UpdateAnswer(msg);
-            const answers = [
-                '수정 안해줄건데~~ㅋㅋ',
-                '니 말 안들을거야',
-                '뭐래 ㅋㅋ'
-            ];
-            randInt = Math.floor(Math.random() * answers.length);
-            msg.reply(answers[randInt]);
+            if(msg.author.id === '373793790034706439'){
+                db.UpdateAnswer(msg);
+            } else{
+                const answers = [
+                    '수정 안해줄건데~~ㅋㅋ',
+                    '니 말 안들을거야',
+                    '뭐래 ㅋㅋ'
+                ];
+                randInt = Math.floor(Math.random() * answers.length);
+                msg.reply(answers[randInt]);
+            }
         } else if (msg.content.startsWith("!재생 방송켜줘")) {
             if (msg.member.voice.channel) {
                 msg.member.voice.channel.join()
