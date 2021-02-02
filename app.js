@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const db = require('./db_config');
+const ytdl = require('ytdl-core');
 require('dotenv').config();
 const client = new Discord.Client();
-
 const naverRankingInfo = require('./services/NaverRankingCrawling');
 
 client.on('ready', () => {
@@ -23,9 +23,15 @@ client.on('message', msg => {
         }
     }
     const BadLanguage = ["섹", "세엑스", "섹스", "쉑", "색", "색스", "새엑스", "세액스", "새액스", "쎅스"];
-    BadLanguage.forEach(v => {
+    BadLanguage.forEach(async(v) => {
+        try{
         if (msg.content === v) {
-            msg.channel.bulkDelete(1);
+            await msg.channel.bulkDelete(1);
+        }
+        }catch(error){
+            const errorMessage = ["적당히 좀 써라...지우기 힘들어 ㅡㅡ", "안지울래..너무 많아..", "넌 정말 대단하구나?", "그만 좀 해줄래?"];
+            const randInt = Math.floor(Math.random() * errorMessage.length);
+            msg.reply(errorMessage[randInt]);
         }
     })
 
@@ -85,19 +91,40 @@ client.on('message', msg => {
                 randInt = Math.floor(Math.random() * answers.length);
                 msg.reply(answers[randInt]);
             }
-        } else if (msg.content.startsWith("!재생 방송켜줘")) {
-            if (msg.member.voice.channel) {
-                msg.member.voice.channel.join()
-                    .then(connection => {
-                        let dispatcher = connection.play(`./static/musics/방송켜줘.mp3`, { seek: 0, volume: 0.5 });
-                        dispatcher.on("end", end => {});
-                    })
-                    .catch(console.error);
-            } else {
-                msg.reply('음성 채널에 들어가고 불러줘~');
+        } else if (msg.content.startsWith("!재생")) {
+            const msgContent = msg.content.split(" ");
+
+            if(msgContent.length == 2){
+                if(msgContent[1] == '방송켜줘'){
+                    if (msg.member.voice.channel) {
+                        msg.member.voice.channel.join()
+                            .then(connection => {
+                                let dispatcher = connection.play(`./static/musics/방송켜줘.mp3`, { seek: 0, volume: 0.8 });
+                                dispatcher.on("end", end => {});
+                            })
+                            .catch(console.error);
+                    } else {
+                        msg.reply('음성 채널에 들어가고 불러줘~');
+                    }
+                } else{
+                    if (msg.member.voice.channel) {
+                        msg.member.voice.channel.join()
+                            .then(connection => {
+                                let dispatcher = connection.play(ytdl(msgContent[1]), { quality: 'highestaudio',seek: 0, volume: 0.2 });
+                                dispatcher.on("end", end => {});
+                            })
+                            .catch(console.error);
+                    } else {
+                        msg.reply('음성 채널에 들어가고 불러줘~');
+                    }
+                }
+            }else{
+                msg.reply("!재생 [유튜브 주소] <-- 이렇게 입력해!")
             }
         } else if (msg.content === '!나가') {
-            msg.member.voice.channel.leave();
+            if(msg.member.voice.channel){
+                msg.member.voice.channel.leave();
+            }
         } else if (msg.content === '!네이버실검' || msg.content === '!실시간' || msg.content === '!실검' || msg.content === '!실시간검색어') {
             naverRankingInfo().then(values => {
                 let messages = ['-----네이버 실시간 Top20-----'];

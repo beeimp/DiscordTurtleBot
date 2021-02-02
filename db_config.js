@@ -54,6 +54,11 @@ async function insertFiles(msg) {
         case ".jpeg":
         case ".svg":
         case ".gif":
+        case ".PNG":
+        case ".JPG":
+        case ".JPEG":
+        case ".SVG":
+        case ".GIF":
             type_ = "images";
             break;
         case ".mp3":
