@@ -4,6 +4,7 @@ const ytdl = require('ytdl-core');
 require('dotenv').config();
 const client = new Discord.Client();
 const naverRankingInfo = require('./services/NaverRankingCrawling');
+const lolSummonerInfo = require('./services/LOLSummonerCrawling');
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -22,7 +23,7 @@ client.on('message', msg => {
             db.InsertFiles(msg);
         }
     }
-    const BadLanguage = ["섹", "세엑스", "섹스", "쉑", "색", "색스", "새엑스", "세액스", "새액스", "쎅스"];
+    const BadLanguage = ["스섹", "섹", "세엑스", "섹스", "쉑", "색", "색스", "새엑스", "세액스", "새액스", "쎅스"];
     BadLanguage.forEach(async(v) => {
         try{
         if (msg.content === v) {
@@ -136,7 +137,46 @@ client.on('message', msg => {
 
         } else if(msg.content === '!링크' || msg.content === '!최근링크'){
             db.SearchLink(msg);
-        } else if (msg.content.startsWith('거북아') && msg.content.split(" ").length > 1) {
+        } else if (msg.content.startsWith("!롤전적")){
+            const content = msg.content.split(" ");
+            if(content.length === 2 && content[0] === "!롤전적") {
+                lolSummonerInfo(content[1]).then( summoner => {
+                    console.log(summoner);
+                    let message = ["```css"];
+                    if(summoner.isSummoner === true){
+                        message.push(`소환사명 : ${summoner.summonerName}`);
+                        summoner.ranking === "" ? {} 
+                        : message.push(`래더랭킹 : ${summoner.ranking}`);
+                        
+                        message.push(`최근전적 : ${summoner.recentKDA}`);
+                        if (summoner.soloTier !== "Unranked" ){
+                            message.push("===== 솔로랭크 정보 =====");
+                            message.push(`${summoner.soloTier} - ${summoner.soloPoint}`);
+                            message.push(`전  적 : ${summoner.soloPercent}`);
+                        } else {
+                            message.push("솔로랭크 : Unranked")
+                        }
+                        if (summoner.freeTier !== "Unranked"){
+                            message.push("===== 자유랭크 정보 =====")
+                            message.push(`${summoner.freeTier} - ${summoner.freePoint}`);
+                            message.push(`전  적 : ${summoner.freePercent}`);
+                        } else {
+                            message.push("자유랭크 : Unranked")
+                        }
+
+                        message.push("```");
+    
+                    msg.channel.send(message.join("\n"));
+                } else{
+                    msg.reply(`${summoner.summonerName} 을 찾을 수 없어.`);
+                }
+                });
+
+            }else{
+                msg.reply("!롤전적 <소환사이름> <-- 이렇게 입력해줘!");
+            }
+
+        }else if (msg.content.startsWith('거북아') && msg.content.split(" ").length > 1) {
             const answers = [
                 '아니',
                 '싫어. 몰라', 

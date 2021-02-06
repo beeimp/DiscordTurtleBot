@@ -5,7 +5,7 @@ const getHTML = async() => {
     try{
         return await axios.get('https://datalab.naver.com/keyword/realtimeList.naver');
     }catch(error){
-        console.error(errror);
+        console.error(error);
     }
 }
 
