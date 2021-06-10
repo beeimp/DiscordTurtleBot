@@ -24,6 +24,7 @@
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "mysql": "^2.18.1",
+    "node-schedule": "^2.0.0",
     "nodemon": "^2.0.6",
     "puppeteer": "^7.0.1",
     "puppeteer-core": "^7.0.1",

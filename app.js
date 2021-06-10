@@ -5,15 +5,19 @@ require("dotenv").config();
 const client = new Discord.Client();
 const naverRankingInfo = require("./services/NaverRankingCrawling");
 const lolSummonerInfo = require("./services/LOLSummonerCrawling");
-const { badLanguage } = require("./config");
-const { getWeather } = require("./services/Weather");
+const { badLanguage, callMe, location } = require("./config");
+const {
+  getShortTermLiveWeather,
+  getShortTermForecastWeather,
+} = require("./services/Weather");
+
+let qeuestWeather = false;
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  getWeather();
 });
 
-client.on("message", (msg) => {
+client.on("message", async (msg) => {
   // db에 메시지 저장
   // console.log(msg);
   if (msg.author.id !== "779613987004219402") {
@@ -63,6 +67,8 @@ client.on("message", (msg) => {
           },
         ],
       });
+    } else if (msg.content.startsWith(callMe)) {
+      msg.reply("걔는 바쁘니까 건들지 마..");
     } else if (msg.content === "!명령어") {
       const content = `!명령어\n!전체삭제\n!삭제 <갯수 - 최대 100>\n!추가 "질문" "답변"\n!수정 "질문" "답변"`;
       msg.channel.send(content);
@@ -104,6 +110,49 @@ client.on("message", (msg) => {
         ];
         randInt = Math.floor(Math.random() * answers.length);
         msg.reply(answers[randInt]);
+      }
+    } else if (msg.content.endsWith("날씨")) {
+      const message = msg.content.split(" ");
+      const locationNames = Object.keys(location);
+      if (!qeuestWeather) {
+        if (message.length == 1) {
+          qeuestWeather = true;
+          locationNames.map(async (name) => {
+            msg.channel.send(
+              await getShortTermLiveWeather(name, location[name])
+            );
+            msg.channel.send(
+              await getShortTermForecastWeather(name, location[name])
+            );
+          });
+          setTimeout(() => {
+            qeuestWeather = false;
+          }, 1000 * 3);
+        } else if (message.length == 2 && locationNames.includes(message[0])) {
+          if (!qeuestWeather) {
+            qeuestWeather = true;
+            msg.channel.send(
+              await getShortTermLiveWeather(message[0], location[message[0]])
+            );
+            msg.channel.send(
+              await getShortTermForecastWeather(
+                message[0],
+                location[message[0]]
+              )
+            );
+            setTimeout(() => {
+              qeuestWeather = false;
+            }, 1000 * 3);
+          } else {
+            msg.reply("천천히 물어봐..");
+          }
+        } else {
+          msg.reply(
+            "이렇게 입력해봐 >" + Object.keys(location).join(" 또는 ") + " 날씨"
+          );
+        }
+      } else {
+        msg.reply("천천히 물어봐..");
       }
     } else if (msg.content.startsWith("!재생")) {
       const msgContent = msg.content.split(" ");
