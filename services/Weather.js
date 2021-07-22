@@ -47,7 +47,7 @@ const weatherParse = (items) => {
         unit = "cm";
         break;
       case "SKY": // 하늘상태
-        const sky = { 1: "맑음", 3: "구름 많음", 4: "흐림" };
+        const sky = { 1: "맑음🌞", 3: "구름 많음⛅", 4: "흐림☁" };
         name = "하늘 상태";
         value = sky[value];
         unit = "";
