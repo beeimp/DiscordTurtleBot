@@ -5,6 +5,7 @@ require("dotenv").config();
 const client = new Discord.Client();
 const naverRankingInfo = require("./services/NaverRankingCrawling");
 const lolSummonerInfo = require("./services/LOLSummonerCrawling");
+const { printCorona } = require("./services/Corona");
 const { badLanguage, callMe, location } = require("./config");
 const {
   getShortTermLiveWeather,
@@ -13,8 +14,15 @@ const {
 
 let qeuestWeather = false;
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  // 테스트
+  try {
+    // await printCorona;
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 client.on("message", async (msg) => {
@@ -68,7 +76,7 @@ client.on("message", async (msg) => {
         ],
       });
     } else if (msg.content.startsWith(callMe)) {
-      msg.reply("걔는 바쁘니까 건들지 마..");
+      // msg.reply("걔는 바쁘니까 건들지 마..");
     } else if (msg.content === "!명령어") {
       const content = `!명령어\n!전체삭제\n!삭제 <갯수 - 최대 100>\n!추가 "질문" "답변"\n!수정 "질문" "답변"`;
       msg.channel.send(content);
@@ -153,6 +161,21 @@ client.on("message", async (msg) => {
         }
       } else {
         msg.reply("천천히 물어봐..");
+      }
+    } else if (
+      [
+        "!코로나",
+        "코로나",
+        "!코로나 확진자",
+        "코로나 확진자",
+        "!확진자",
+        "확진자",
+      ].includes(msg.content)
+    ) {
+      try {
+        msg.reply(await printCorona);
+      } catch (err) {
+        console.log("코로나 확진자 에러 :" + err);
       }
     } else if (msg.content.startsWith("!재생")) {
       const msgContent = msg.content.split(" ");
