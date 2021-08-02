@@ -19,15 +19,15 @@ client.on("ready", async () => {
 
   // 테스트
   try {
-    // await printCorona;
   } catch (err) {
     console.error(err);
   }
 });
 
 client.on("message", async (msg) => {
+  const date = new Date();
+
   // db에 메시지 저장
-  // console.log(msg);
   if (msg.author.id !== "779613987004219402") {
     // 봇에 대한 채팅은 필터링
     db.InsertChatting(msg);
@@ -173,7 +173,7 @@ client.on("message", async (msg) => {
       ].includes(msg.content)
     ) {
       try {
-        msg.reply(await printCorona);
+        msg.reply(await printCorona(date));
       } catch (err) {
         console.log("코로나 확진자 에러 :" + err);
       }

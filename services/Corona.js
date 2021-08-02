@@ -4,39 +4,47 @@ const getCorona = (date) => {
   const baseUrl =
     "http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson";
 
+  if (date.getHours() <= 9) {
+    date.setDate(date.getDay() - 1);
+  }
   const dateParse = date
     .toLocaleDateString()
     .split("-")
     .map((v) => (v.toString().length > 1 ? v : "0" + v))
     .join("");
   try {
-    return Axios.get(baseUrl, {
-      //   headers: { Accept: "application/json" },
-      params: {
-        ServiceKey: process.env.CORONA_BY_CITY_AUTH_KEY,
-        pageNo: 1,
-        numOfRows: 100,
-        startCreateDt: dateParse,
-        endCreateDt: dateParse,
-      },
-    })
-      .then((json) => json.data.response.body)
-      .then((body) => body.items.item);
+    return (
+      Axios.get(baseUrl, {
+        //   headers: { Accept: "application/json" },
+        params: {
+          ServiceKey: process.env.CORONA_BY_CITY_AUTH_KEY,
+          pageNo: 1,
+          numOfRows: 100,
+          //   startCreateDt: dateParse,
+          //   endCreateDt: dateParse,
+        },
+      })
+        .then((json) => json.data.response.body)
+        //   .then((body) => console.log(body));
+        .then((body) => body.items.item)
+    );
   } catch (err) {
     console.error(err);
   }
 };
 
-const printCorona = async () => {
-  const date = new Date();
-  const today = date;
-
+const printCorona = async (date) => {
   try {
-    const todayCoronas = await getCorona(today);
-
+    const todayCoronas = await getCorona(date);
+    if (!todayCoronas) {
+      return "오늘의 코로나 확진자가 최신화되지 않았습니다.";
+    }
     let messages = [];
 
     todayCoronas.map((todayCorona, i) => {
+      if (todayCorona.gubun === "합계") {
+        messages.unshift("");
+      }
       messages.unshift(
         `${todayCorona.gubun} : ${todayCorona.defCnt} 명 (+ ${todayCorona.incDec} 명) [지역 : ${todayCorona.localOccCnt} / 해외 : ${todayCorona.overFlowCnt}]`
       );
@@ -54,10 +62,4 @@ const printCorona = async () => {
   }
 };
 
-exports.printCorona = printCorona();
-
-/*
- * 1. 90초마다 코로나 조회
- * 2. 전날과 금일의 해당 지역의 코로나 확진자 비교
- * 3. 1시간 또는 확진자 변동에 따라 출력
- */
+exports.printCorona = printCorona;
