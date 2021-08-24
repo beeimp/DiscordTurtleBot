@@ -3,22 +3,55 @@ const db = require("../config/db_config");
 const ytdl = require("ytdl-core");
 require("dotenv").config();
 const client = new Discord.Client();
-const naverRankingInfo = require("./services/NaverRankingCrawling");
+// const naverRankingInfo = require("./services/NaverRankingCrawling");
 const lolSummonerInfo = require("./services/LOLSummonerCrawling");
 const { printCorona } = require("./services/Corona");
-const { badLanguage, callMe, location } = require("../config/config");
 const {
+  badLanguage,
+  callMe,
+  location,
+  locations,
+} = require("../config/config");
+const {
+  getWeather,
   getShortTermLiveWeather,
   getShortTermForecastWeather,
 } = require("./services/Weather");
+const schedule = require("node-schedule");
+const Storage = require("../lib/storage");
 
 let qeuestWeather = false;
+const storage = new Storage();
 
 client.on("ready", async () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-
   // 테스트
   try {
+    // 날씨 정보 저장
+    const weather = ["currentWeather", "forecastWeather"];
+    weather.map((weatherType, num) => {
+      locations.map((location) => {
+        getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
+          (items) => {
+            storage.set(`${weatherType}_${location.name}`, items);
+          }
+        );
+      });
+    });
+
+    // *시 30분 마다 작업 실행
+    schedule.scheduleJob("30 * * * *", () => {
+      weather.map((weatherType, num) => {
+        locations.map((location) => {
+          getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
+            (items) => {
+              storage.set(`${weatherType}_${location.name}`, items);
+            }
+          );
+        });
+      });
+    });
+
+    console.log(`Logged in as ${client.user.tag}!`);
   } catch (err) {
     console.error(err);
   }
@@ -127,10 +160,16 @@ client.on("message", async (msg) => {
           qeuestWeather = true;
           locationNames.map(async (name) => {
             msg.channel.send(
-              await getShortTermLiveWeather(name, location[name])
+              await getShortTermLiveWeather(
+                name,
+                storage.get(`currentWeather_${name}`)
+              )
             );
             msg.channel.send(
-              await getShortTermForecastWeather(name, location[name])
+              await getShortTermForecastWeather(
+                name,
+                storage.get(`forecastWeather_${name}`)
+              )
             );
           });
           setTimeout(() => {
@@ -150,7 +189,7 @@ client.on("message", async (msg) => {
             );
             setTimeout(() => {
               qeuestWeather = false;
-            }, 1000 * 3);
+            }, 1000 * 1);
           } else {
             msg.reply("천천히 물어봐..");
           }

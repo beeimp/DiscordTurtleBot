@@ -1,5 +1,4 @@
 const Axios = require("axios").default;
-const schedule = require("node-schedule");
 
 const weatherParse = (items) => {
   return items.map((item, itemIndex) => {
@@ -278,20 +277,12 @@ const getWeather = (num = 0, nx = 68, ny = 80) => {
   );
 };
 
-const getScheduleWeather = () => {
-  return schedule.scheduleJob("5 30 /3 * * *", async () => {
-    try {
-      const items = await getWeather();
-    } catch (error) {
-      console.error(error);
-    }
-  });
-};
-
-const getShortTermLiveWeather = async (name = "", location = [68, 80]) => {
+const getShortTermLiveWeather = async (name = "", currentWeather) => {
   try {
-    const currentWeather = await getWeather(0, location[0], location[1]);
-
+    // const currentWeather = await getWeather(0, location[0], location[1]);
+    if (!currentWeather) {
+      return `현재 날씨 정보가 없습니다`;
+    }
     let info = {};
     currentWeather.map((item) => {
       let result = "";
@@ -323,22 +314,24 @@ const getShortTermLiveWeather = async (name = "", location = [68, 80]) => {
   }
 };
 
-const getShortTermForecastWeather = async (name, location = [68, 80]) => {
+const getShortTermForecastWeather = async (name, forecastWeather) => {
   try {
+    if (!forecastWeather) {
+      return `과거 날씨 정보가 없습니다`;
+    }
+
     let result = [];
 
     result.push("```cs");
     result.push(`========== ${name} 시간대별 날씨 ==========`);
-    const forecastWeather = await getWeather(1, location[0], location[1]);
+    // const forecastWeather = await getWeather(1, location[0], location[1]);
     const dateSet = new Set(forecastWeather.map((item) => item.fcstDate));
     const dateArray = [...dateSet];
 
     dateArray.map((date, index) => {
       result.push(
         `
--------- ${date.substring(4, 6)}. ${date.substring(6, 8)}. ( ${
-          index == 0 ? "오늘" : "내일"
-        } ) --------`
+-------- ${date.substring(4, 6)}월 ${date.substring(6, 8)}일 --------`
       );
       const timeSet = new Set(
         forecastWeather
