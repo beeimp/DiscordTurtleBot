@@ -220,19 +220,20 @@ client.on("message", async (msg) => {
       if (msg.member.voice.channel) {
         msg.member.voice.channel.leave();
       }
-    } else if (
-      msg.content === "!네이버실검" ||
-      msg.content === "!실시간" ||
-      msg.content === "!실검" ||
-      msg.content === "!실시간검색어"
-    ) {
-      naverRankingInfo().then((values) => {
-        let messages = ["-----네이버 실시간 Top20-----"];
-        values.forEach((v) => {
-          messages.push(`${v.rank}위 : ${v.title}`);
-        });
-        msg.channel.send(messages.join("\n"));
-      });
+      // 네이버 실검 삭제
+      // } else if (
+      //   msg.content === "!네이버실검" ||
+      //   msg.content === "!실시간" ||
+      //   msg.content === "!실검" ||
+      //   msg.content === "!실시간검색어"
+      // ) {
+      //   naverRankingInfo().then((values) => {
+      //     let messages = ["-----네이버 실시간 Top20-----"];
+      //     values.forEach((v) => {
+      //       messages.push(`${v.rank}위 : ${v.title}`);
+      //     });
+      //     msg.channel.send(messages.join("\n"));
+      //   });
     } else if (msg.content === "!링크" || msg.content === "!최근링크") {
       db.SearchLink(msg);
     } else if (msg.content.startsWith("!롤전적")) {
