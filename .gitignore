@@ -1,5 +1,7 @@
 node_modules
-static/*
+static/images/*
+static/musics/*
+static/others/*
 .env
 start.bat
 config.js
