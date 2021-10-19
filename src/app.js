@@ -38,8 +38,8 @@ client.on("ready", async () => {
       });
     });
 
-    // *시 30분 마다 작업 실행
-    schedule.scheduleJob("30 * * * *", () => {
+    // 30분 마다 작업 실행
+    schedule.scheduleJob("0,30 * * * *", () => {
       weather.map((weatherType, num) => {
         locations.map((location) => {
           getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
@@ -179,12 +179,15 @@ client.on("message", async (msg) => {
           if (!qeuestWeather) {
             qeuestWeather = true;
             msg.channel.send(
-              await getShortTermLiveWeather(message[0], location[message[0]])
+              await getShortTermLiveWeather(
+                message[0],
+                storage.get(`currentWeather_${message[0]}`)
+              )
             );
             msg.channel.send(
               await getShortTermForecastWeather(
                 message[0],
-                location[message[0]]
+                storage.get(`forecastWeather_${message[0]}`)
               )
             );
             setTimeout(() => {
