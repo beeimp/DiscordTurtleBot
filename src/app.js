@@ -40,6 +40,7 @@ client.on("ready", async () => {
 
     // 30분 마다 작업 실행
     schedule.scheduleJob("0,30 * * * *", () => {
+      // 날씨
       weather.map((weatherType, num) => {
         locations.map((location) => {
           getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
