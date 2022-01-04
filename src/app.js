@@ -82,7 +82,6 @@ client.on("message", async (msg) => {
     } catch (error) {
       const errorMessage = [
         "적당히 좀 써라...지우기 힘들어 ㅡㅡ",
-        "안지울래..너무 많아..",
         "넌 정말 대단하구나?",
         "그만 좀 해줄래?",
       ];
