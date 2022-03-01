@@ -77,7 +77,7 @@ client.on("message", async (msg) => {
   badLanguage.forEach(async (v) => {
     try {
       if (msg.content === v || msg.content.startsWith(v)) {
-        await msg.channel.bulkDelete(1).catch(error => msg.reply(`에러 메세지: ${error}`));
+        await msg.channel.bulkDelete(1);
       }
     } catch (error) {
       const errorMessage = [
@@ -87,6 +87,7 @@ client.on("message", async (msg) => {
       ];
       const randInt = Math.floor(Math.random() * errorMessage.length);
       msg.reply(errorMessage[randInt]);
+      console.log(`에러 메세지: ${error}`);
     }
   });
 
