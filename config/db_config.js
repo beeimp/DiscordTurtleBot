@@ -67,6 +67,9 @@ function insertLink(msg) {
 }
 // local에 파일 추가 및 files table에 데이터 추가
 async function insertFiles(msg) {
+  const path = "/mnt/hard/Discord";
+
+
   const fileImformation = msg.attachments.toJSON()[0];
   let type_ = "";
   switch (`.${fileImformation.name.split(".")[1]}`) {
@@ -96,7 +99,7 @@ async function insertFiles(msg) {
     .then((response) => {
       response.data.pipe(
         fs.createWriteStream(
-          `./static/${type_}/${msg.createdTimestamp}_${fileImformation.name}`
+          `${path}/${type_}/${msg.createdTimestamp}_${fileImformation.name}`
         )
       );
     });
