@@ -77,7 +77,7 @@ client.on("message", async (msg) => {
   badLanguage.forEach(async (v) => {
     try {
       if (msg.content === v || msg.content.startsWith(v)) {
-        await msg.channel.bulkDelete(1);
+        await msg.channel.delete();
       }
     } catch (error) {
       const errorMessage = [
