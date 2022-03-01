@@ -69,40 +69,40 @@ function insertLink(msg) {
 async function insertFiles(msg) {
   const path = "/mnt/hard/Discord";
 
+  // OS 변경으로 임시중단 
+  // const fileImformation = msg.attachments.toJSON()[0];
+  // let type_ = "";
+  // switch (`.${fileImformation.name.split(".")[1]}`) {
+  //   case ".jpg":
+  //   case ".png":
+  //   case ".jpeg":
+  //   case ".svg":
+  //   case ".gif":
+  //   case ".PNG":
+  //   case ".JPG":
+  //   case ".JPEG":
+  //   case ".SVG":
+  //   case ".GIF":
+  //     type_ = "images";
+  //     break;
+  //   case ".mp3":
+  //     type_ = "musics";
+  //     break;
+  //   default:
+  //     type_ = "others";
+  // }
 
-  const fileImformation = msg.attachments.toJSON()[0];
-  let type_ = "";
-  switch (`.${fileImformation.name.split(".")[1]}`) {
-    case ".jpg":
-    case ".png":
-    case ".jpeg":
-    case ".svg":
-    case ".gif":
-    case ".PNG":
-    case ".JPG":
-    case ".JPEG":
-    case ".SVG":
-    case ".GIF":
-      type_ = "images";
-      break;
-    case ".mp3":
-      type_ = "musics";
-      break;
-    default:
-      type_ = "others";
-  }
-
-  await axios
-    .get(fileImformation.url, {
-      responseType: "stream",
-    })
-    .then((response) => {
-      response.data.pipe(
-        fs.createWriteStream(
-          `${path}/${type_}/${msg.createdTimestamp}_${fileImformation.name}`
-        )
-      );
-    });
+  // await axios
+  //   .get(fileImformation.url, {
+  //     responseType: "stream",
+  //   })
+  //   .then((response) => {
+  //     response.data.pipe(
+  //       fs.createWriteStream(
+  //         `${path}/${type_}/${msg.createdTimestamp}_${fileImformation.name}`
+  //       )
+  //     );
+  //   });
   const values = [
     msg.author.id,
     msg.author.username,
