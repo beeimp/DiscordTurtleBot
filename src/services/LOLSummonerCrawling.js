@@ -1,60 +1,60 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const puppeteer = require("puppeteer");
+// const puppeteer = require("puppeteer");
 
-const dynamicCrawling = async(summonerName) => {
-    let result = {
-        "isInGame": false,
-        "inGameBlueTeam": [],
-        "inGameRedTeam": [],
-    };
+// const dynamicCrawling = async(summonerName) => {
+//     let result = {
+//         "isInGame": false,
+//         "inGameBlueTeam": [],
+//         "inGameRedTeam": [],
+//     };
 
-    const summonerInfo = async(page, selector) => {
-        return {
-            name: await page.$eval(selector+"> td.SummonerName.Cell > a", element => element.textContent),
-            championName: await page.$eval(selector+"> td.ChampionImage.Cell > a", element => element.title),
-            championHistoryRatio: await page.$eval(selector+"> td.ChampionInfo.Cell > div.WinRatio > span.Ratio", element => element.textContent),
-            championHistoryCount: await page.$eval(selector+"> td.ChampionInfo.Cell > div.WinRatio > span.TotalCount", element => element.textContent),
-            rankTier: await page.$eval(selector + "> td.CurrentSeasonTierRank.Cell > div.TierRank", element => element.textContent.trim()),
-            rankHistory: await page.$eval(selector + "> td.RankedWinRatio.Cell", element => element.textContent.trim()),
-            previousRankTier: await page.$eval(selector + "> td.PreviousSeasonTier.Cell > img", element => element.title)
-        }
-    }
+//     const summonerInfo = async(page, selector) => {
+//         return {
+//             name: await page.$eval(selector+"> td.SummonerName.Cell > a", element => element.textContent),
+//             championName: await page.$eval(selector+"> td.ChampionImage.Cell > a", element => element.title),
+//             championHistoryRatio: await page.$eval(selector+"> td.ChampionInfo.Cell > div.WinRatio > span.Ratio", element => element.textContent),
+//             championHistoryCount: await page.$eval(selector+"> td.ChampionInfo.Cell > div.WinRatio > span.TotalCount", element => element.textContent),
+//             rankTier: await page.$eval(selector + "> td.CurrentSeasonTierRank.Cell > div.TierRank", element => element.textContent.trim()),
+//             rankHistory: await page.$eval(selector + "> td.RankedWinRatio.Cell", element => element.textContent.trim()),
+//             previousRankTier: await page.$eval(selector + "> td.PreviousSeasonTier.Cell > img", element => element.title)
+//         }
+//     }
 
-    try{
-        const browser = await puppeteer.launch(
-            // {headless: false}
-            );
-        const page = await browser.newPage();
-        await page.goto(`https://www.op.gg/summoner/userName=${encodeURI(summonerName)}`);
-        await page.$eval('body > div.l-wrap.l-wrap--summoner > div.l-container > div > div > div.Menu > dl > dd.Item.tabHeader.inGame > a', element => element.click());
-        setTimeout(()=>{}, 1000);
-        let isInGameMessage = await page.$eval("div.tabItem.Content.SummonerLayoutContent.summonerLayout-spectator > div > h2", element => element.textContent).catch((reason => {return ""}));
+//     try{
+//         const browser = await puppeteer.launch(
+//             // {headless: false}
+//             );
+//         const page = await browser.newPage();
+//         await page.goto(`https://www.op.gg/summoner/userName=${encodeURI(summonerName)}`);
+//         await page.$eval('body > div.l-wrap.l-wrap--summoner > div.l-container > div > div > div.Menu > dl > dd.Item.tabHeader.inGame > a', element => element.click());
+//         setTimeout(()=>{}, 1000);
+//         let isInGameMessage = await page.$eval("div.tabItem.Content.SummonerLayoutContent.summonerLayout-spectator > div > h2", element => element.textContent).catch((reason => {return ""}));
 
-        // 인게임 정보 가져오기
-        if (isInGameMessage === ""){
-            // 블루팀
-            for(let i = 1; i <= 5; i++){
-                let selector = `table.Table.Team-100 > tbody > tr:nth-child(${i})`
-                result.inGameBlueTeam.push(
-                    await summonerInfo(page, selector)
-                )
-            }
-            // 레드팀
-            for(let i = 1; i <= 5; i++){
-                let selector = `table.Table.Team-200 > tbody > tr:nth-child(${i})`
-                result.inGameRedTeam.push(
-                    await summonerInfo(page, selector)
-                )
-            }
-        }
-        await browser.close();
-        return result;
-    }catch(error){
-        console.error(error);
-    }
-}
+//         // 인게임 정보 가져오기
+//         if (isInGameMessage === ""){
+//             // 블루팀
+//             for(let i = 1; i <= 5; i++){
+//                 let selector = `table.Table.Team-100 > tbody > tr:nth-child(${i})`
+//                 result.inGameBlueTeam.push(
+//                     await summonerInfo(page, selector)
+//                 )
+//             }
+//             // 레드팀
+//             for(let i = 1; i <= 5; i++){
+//                 let selector = `table.Table.Team-200 > tbody > tr:nth-child(${i})`
+//                 result.inGameRedTeam.push(
+//                     await summonerInfo(page, selector)
+//                 )
+//             }
+//         }
+//         await browser.close();
+//         return result;
+//     }catch(error){
+//         console.error(error);
+//     }
+// }
 
 const opggGetHTML = async(summonerName) => {
     try{
