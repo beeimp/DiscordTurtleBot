@@ -213,4 +213,4 @@ const poroWebCrawiling = (summonerName) => {
 
 module.exports.opggWebCrawling = opggWebCrawling;
 module.exports.poroWebCrawiling = poroWebCrawiling;
-module.exports.dynamicCrawling = dynamicCrawling;
+// module.exports.dynamicCrawling = dynamicCrawling;
