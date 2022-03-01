@@ -122,11 +122,13 @@ client.on("message", async (msg) => {
           if (num > 100) {
             msg.reply("그만큼은 힘들어.. 안지울래..");
           } else {
-            msg.channel.bulkDelete(num);
+            msg.channel.bulkDelete(messages=num);
           }
         } else {
           db.DeleteAnswer(msg);
         }
+      } else {
+        msg.reply("!삭제 <지울 개수>");
       }
     } else if (msg.content.startsWith("!추가")) {
       if (msg.author.id === "373793790034706439") {
