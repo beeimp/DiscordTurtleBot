@@ -18,7 +18,7 @@ const {
   getShortTermForecastWeather,
 } = require("./services/Weather");
 const schedule = require("node-schedule");
-const Storage = require("../lib/storage").default;
+const Storage = require("../lib/storage");
 
 let qeuestWeather = false;
 const storage = new Storage();
