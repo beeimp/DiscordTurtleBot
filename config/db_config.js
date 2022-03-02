@@ -46,15 +46,15 @@ function insertChatting(msg) {
 
 // 채팅에서 link 추가
 function insertLink(msg) {
-  const linkImformation = msg.embeds[0];
+  const linkInformation = msg.embeds[0];
   const values = [
     msg.author.id,
     msg.author.name,
     msg.guild.id,
     msg.channel.id,
-    linkImformation.title,
-    linkImformation.description,
-    linkImformation.url,
+    linkInformation.title,
+    linkInformation.description,
+    linkInformation.url,
     new Date(msg.createdTimestamp),
   ];
   connection.query(
@@ -69,10 +69,10 @@ function insertLink(msg) {
 async function insertFiles(msg) {
   const path = "/mnt/hard/Discord";
 
+  const fileInformation = msg.attachments.toJSON()[0];
   // OS 변경으로 임시중단 
-  // const fileImformation = msg.attachments.toJSON()[0];
   // let type_ = "";
-  // switch (`.${fileImformation.name.split(".")[1]}`) {
+  // switch (`.${fileInformation.name.split(".")[1]}`) {
   //   case ".jpg":
   //   case ".png":
   //   case ".jpeg":
@@ -93,13 +93,13 @@ async function insertFiles(msg) {
   // }
 
   // await axios
-  //   .get(fileImformation.url, {
+  //   .get(fileInformation.url, {
   //     responseType: "stream",
   //   })
   //   .then((response) => {
   //     response.data.pipe(
   //       fs.createWriteStream(
-  //         `${path}/${type_}/${msg.createdTimestamp}_${fileImformation.name}`
+  //         `${path}/${type_}/${msg.createdTimestamp}_${fileInformation.name}`
   //       )
   //     );
   //   });
@@ -108,7 +108,7 @@ async function insertFiles(msg) {
     msg.author.username,
     msg.guild.name,
     msg.channel.name,
-    fileImformation.name,
+    fileInformation.name,
     type_,
     new Date(msg.createdTimestamp),
   ];
