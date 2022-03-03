@@ -12,11 +12,11 @@ const {
   location,
   locations,
 } = require("../config/config");
-// const { api 변경으로 중단
-//   getWeather,
-//   getShortTermLiveWeather,
-//   getShortTermForecastWeather,
-// } = require("./services/Weather");
+const { 
+  getWeather,
+  getShortTermLiveWeather,
+  getShortTermForecastWeather,
+} = require("./services/Weather");
 const schedule = require("node-schedule");
 const Storage = require("../lib/storage");
 
@@ -26,31 +26,31 @@ const storage = new Storage();
 client.on("ready", async () => {
   // 테스트
   try {
-    // // 날씨 정보 저장 - api 변경으로 중단
-    // const weather = ["currentWeather", "forecastWeather"];
-    // weather.map((weatherType, num) => {
-    //   locations.map((location) => {
-    //     getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
-    //       (items) => {
-    //         storage.set(`${weatherType}_${location.name}`, items);
-    //       }
-    //     );
-    //   });
-    // });
+    // 날씨 정보 저장 - api 변경으로 중단
+    const weather = ["currentWeather", "forecastWeather"];
+    weather.map((weatherType, num) => {
+      locations.map((location) => {
+        getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
+          (items) => {
+            storage.set(`${weatherType}_${location.name}`, items);
+          }
+        );
+      });
+    });
 
-    // // 30분 마다 작업 실행
-    // schedule.scheduleJob("0,30 * * * *", () => {
-    //   // 날씨
-    //   weather.map((weatherType, num) => {
-    //     locations.map((location) => {
-    //       getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
-    //         (items) => {
-    //           storage.set(`${weatherType}_${location.name}`, items);
-    //         }
-    //       );
-    //     });
-    //   });
-    // });
+    // 30분 마다 작업 실행
+    schedule.scheduleJob("0,30 * * * *", () => {
+      // 날씨
+      weather.map((weatherType, num) => {
+        locations.map((location) => {
+          getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
+            (items) => {
+              storage.set(`${weatherType}_${location.name}`, items);
+            }
+          );
+        });
+      });
+    });
 
     console.log(`Logged in as ${client.user.tag}!`);
   } catch (err) {
@@ -156,58 +156,58 @@ client.on("message", async (msg) => {
         randInt = Math.floor(Math.random() * answers.length);
         msg.reply(answers[randInt]);
       }
-    // } else if (msg.content.endsWith("날씨")) { api 변경으로 중단
-    //   const message = msg.content.split(" ");
-    //   const locationNames = Object.keys(location);
-    //   if (!qeuestWeather) {
-    //     if (message.length == 1) {
-    //       qeuestWeather = true;
-    //       locationNames.map(async (name) => {
-    //         msg.channel.send(
-    //           await getShortTermLiveWeather(
-    //             name,
-    //             storage.get(`currentWeather_${name}`)
-    //           )
-    //         );
-    //         msg.channel.send(
-    //           await getShortTermForecastWeather(
-    //             name,
-    //             storage.get(`forecastWeather_${name}`)
-    //           )
-    //         );
-    //       });
-    //       setTimeout(() => {
-    //         qeuestWeather = false;
-    //       }, 1000 * 3);
-    //     } else if (message.length == 2 && locationNames.includes(message[0])) {
-    //       if (!qeuestWeather) {
-    //         qeuestWeather = true;
-    //         msg.channel.send(
-    //           await getShortTermLiveWeather(
-    //             message[0],
-    //             storage.get(`currentWeather_${message[0]}`)
-    //           )
-    //         );
-    //         msg.channel.send(
-    //           await getShortTermForecastWeather(
-    //             message[0],
-    //             storage.get(`forecastWeather_${message[0]}`)
-    //           )
-    //         );
-    //         setTimeout(() => {
-    //           qeuestWeather = false;
-    //         }, 1000 * 1);
-    //       } else {
-    //         msg.reply("천천히 물어봐..");
-    //       }
-    //     } else {
-    //       msg.reply(
-    //         "이렇게 입력해봐 >" + Object.keys(location).join(" 또는 ") + " 날씨"
-    //       );
-    //     }
-    //   } else {
-    //     msg.reply("천천히 물어봐..");
-    //   }
+    } else if (msg.content.endsWith("날씨")) { 
+      const message = msg.content.split(" ");
+      const locationNames = Object.keys(location);
+      if (!qeuestWeather) {
+        if (message.length == 1) {
+          qeuestWeather = true;
+          locationNames.map(async (name) => {
+            msg.channel.send(
+              await getShortTermLiveWeather(
+                name,
+                storage.get(`currentWeather_${name}`)
+              )
+            );
+            msg.channel.send(
+              await getShortTermForecastWeather(
+                name,
+                storage.get(`forecastWeather_${name}`)
+              )
+            );
+          });
+          setTimeout(() => {
+            qeuestWeather = false;
+          }, 1000 * 3);
+        } else if (message.length == 2 && locationNames.includes(message[0])) {
+          if (!qeuestWeather) {
+            qeuestWeather = true;
+            msg.channel.send(
+              await getShortTermLiveWeather(
+                message[0],
+                storage.get(`currentWeather_${message[0]}`)
+              )
+            );
+            msg.channel.send(
+              await getShortTermForecastWeather(
+                message[0],
+                storage.get(`forecastWeather_${message[0]}`)
+              )
+            );
+            setTimeout(() => {
+              qeuestWeather = false;
+            }, 1000 * 1);
+          } else {
+            msg.reply("천천히 물어봐..");
+          }
+        } else {
+          msg.reply(
+            "이렇게 입력해봐 >" + Object.keys(location).join(" 또는 ") + " 날씨"
+          );
+        }
+      } else {
+        msg.reply("천천히 물어봐..");
+      }
     } else if (
       [
         "!코로나",

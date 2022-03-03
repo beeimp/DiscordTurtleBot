@@ -117,7 +117,7 @@ const weatherParse = (items) => {
 };
 
 const getWeather = (num = 0, nx = 68, ny = 80) => {
-  const baseUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/";
+  const baseUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/";
 
   const apiFunction = [
     { name: "getUltraSrtNcst", desc: "초단기실황조회" },
