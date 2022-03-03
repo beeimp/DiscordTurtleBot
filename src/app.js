@@ -69,9 +69,10 @@ client.on("message", async (msg) => {
     if (msg.embeds[0] && msg.embeds[0].type === "link") {
       db.InsertLink(msg);
     }
-    if (msg.attachments && msg.attachments.toJSON()[0]) {
-      db.InsertFiles(msg);
-    }
+    // 파일 저장 중단
+    // if (msg.attachments && msg.attachments.toJSON()[0]) {
+    //   db.InsertFiles(msg);
+    // }
   }
 
   badLanguage.forEach(async (v) => {
