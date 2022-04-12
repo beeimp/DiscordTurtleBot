@@ -1,11 +1,18 @@
-const Discord = require("discord.js");
+const { Client, Intents } = require('discord.js');
 const db = require("../config/db_config");
 const ytdl = require("ytdl-core");
 require("dotenv").config();
-const client = new Discord.Client();
+const client = new Client({
+  intents: [
+    Intents.FLAGS.GUILDS, 
+    Intents.FLAGS.GUILD_MESSAGES, 
+    Intents.FLAGS.GUILD_INTEGRATIONS,
+    Intents.FLAGS.DIRECT_MESSAGES
+  ]
+});
 // const naverRankingInfo = require("./services/NaverRankingCrawling");
-const lolSummonerInfo = require("./services/LOLSummonerCrawling");
-const { printCorona } = require("./services/Corona");
+// const lolSummonerInfo = require("./services/LOLSummonerCrawling");
+// const { printCorona } = require("./services/Corona");
 const {
   badLanguage,
   callMe,
@@ -51,16 +58,38 @@ client.on("ready", async () => {
     //     });
     //   });
     // });
-
     console.log(`Logged in as ${client.user.tag}!`);
   } catch (err) {
     console.error(err);
   }
+
+  // const guildId = '784331418494959616';
+  // // const guildId = '963432279613522000';
+  
+  // const guild = client.guilds.cache.get(guildId);
+  // let commands = guild ? guild.commands : client.application?.commands;
+
+  // commands?.create({
+  //   name: 'ping',
+  //   description: 'Poing!!!',
+
+  // })
 });
 
-client.on("message", async (msg) => {
-  const date = new Date();
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
 
+  const {commandName, option} = interaction;
+  if (commandName === 'ping') {
+    await interaction.reply({
+      content: 'Pong!',
+      ephemeral: true
+    });
+  }
+});
+
+client.on("messageCreate", async (msg) => {
+  const date = new Date();
   // db에 메시지 저장
   if (msg.author.id !== "779613987004219402") {
     // 봇에 대한 채팅은 필터링
@@ -357,4 +386,4 @@ client.on("message", async (msg) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.TEST_DISCORD_TOKEN);
