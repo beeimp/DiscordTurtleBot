@@ -1,6 +1,6 @@
 {
   "name": "discordturtlebot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,15 +18,19 @@
   },
   "homepage": "https://github.com/kogi9231/DiscordTurtleBot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.3.3",
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
     "axios": "^0.21.1",
-    "cheerio": "^1.0.0-rc.3",
-    "discord.js": "^12.5.1",
-    "dotenv": "^8.2.0",
+    "discord-api-types": "^0.31.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^8.6.0",
     "mysql": "^2.18.1",
-    "node-schedule": "^2.0.0",
-    "nodemon": "^2.0.6",
-    "ytdl-core": "^4.5.0"
+    "node-schedule": "^2.1.0",
+    "nodemon": "^2.0.15",
+    "ytdl-core": "^4.11.0"
   },
-  "keywords": []
+  "keywords": [],
+  "directories": {
+    "lib": "lib"
+  }
 }
