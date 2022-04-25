@@ -4,8 +4,8 @@ const ytdl = require("ytdl-core");
 require("dotenv").config();
 const client = new Client({
   intents: [
-    Intents.FLAGS.GUILDS, 
-    Intents.FLAGS.GUILD_MESSAGES, 
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILD_INTEGRATIONS,
     Intents.FLAGS.DIRECT_MESSAGES
   ]
@@ -19,73 +19,30 @@ const {
   location,
   locations,
 } = require("../config/config");
-// const { 
-//   getWeather,
-//   getShortTermLiveWeather,
-//   getShortTermForecastWeather,
-// } = require("./services/Weather");
 const schedule = require("node-schedule");
 const Storage = require("../lib/storage");
+
+// createCommand
+const createCommand = require('./command/createCommand');
+const interactionsCommand = require('./command/interactionsCommand');
 
 let qeuestWeather = false;
 const storage = new Storage();
 
 client.on("ready", async () => {
-  // 테스트
-  try {
-    // 날씨 정보 저장 - api 변경으로 중단
-    // const weather = ["currentWeather", "forecastWeather"];
-    // weather.map((weatherType, num) => {
-    //   locations.map((location) => {
-    //     getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
-    //       (items) => {
-    //         storage.set(`${weatherType}_${location.name}`, items);
-    //       }
-    //     );
-    //   });
-    // });
+  console.log(`Logged in as ${client.user.tag}!`);
 
-    // // 30분 마다 작업 실행
-    // schedule.scheduleJob("0,30 * * * *", () => {
-    //   // 날씨
-    //   weather.map((weatherType, num) => {
-    //     locations.map((location) => {
-    //       getWeather((num = num), (nx = location.nx), (ny = location.ny)).then(
-    //         (items) => {
-    //           storage.set(`${weatherType}_${location.name}`, items);
-    //         }
-    //       );
-    //     });
-    //   });
-    // });
-    console.log(`Logged in as ${client.user.tag}!`);
-  } catch (err) {
-    console.error(err);
-  }
+  const guildId = '784331418494959616';
+  // const guildId = '963432279613522000';
 
-  // const guildId = '784331418494959616';
-  // // const guildId = '963432279613522000';
-  
-  // const guild = client.guilds.cache.get(guildId);
-  // let commands = guild ? guild.commands : client.application?.commands;
+  const guild = client.guilds.cache.get(guildId);
 
-  // commands?.create({
-  //   name: 'ping',
-  //   description: 'Poing!!!',
-
-  // })
+  createCommand(client, guild);
 });
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
-
-  const {commandName, option} = interaction;
-  if (commandName === 'ping') {
-    await interaction.reply({
-      content: 'Pong!',
-      ephemeral: true
-    });
-  }
+  interactionsCommand(client, interaction);
 });
 
 client.on("messageCreate", async (msg) => {
@@ -103,7 +60,6 @@ client.on("messageCreate", async (msg) => {
     //   db.InsertFiles(msg);
     // }
   }
-
   badLanguage.forEach(async (v) => {
     try {
       if (msg.content === v || msg.content.startsWith(v)) {
@@ -153,7 +109,7 @@ client.on("messageCreate", async (msg) => {
           if (num > 100) {
             msg.reply("그만큼은 힘들어.. 안지울래..");
           } else {
-            msg.channel.bulkDelete(messages=num);
+            msg.channel.bulkDelete(messages = num);
           }
         } else {
           db.DeleteAnswer(msg);
@@ -185,59 +141,6 @@ client.on("messageCreate", async (msg) => {
         randInt = Math.floor(Math.random() * answers.length);
         msg.reply(answers[randInt]);
       }
-    // 날씨 중단
-    // } else if (msg.content.endsWith("날씨")) { 
-    //   const message = msg.content.split(" ");
-    //   const locationNames = Object.keys(location);
-    //   if (!qeuestWeather) {
-    //     if (message.length == 1) {
-    //       qeuestWeather = true;
-    //       locationNames.map(async (name) => {
-    //         msg.channel.send(
-    //           await getShortTermLiveWeather(
-    //             name,
-    //             storage.get(`currentWeather_${name}`)
-    //           )
-    //         );
-    //         msg.channel.send(
-    //           await getShortTermForecastWeather(
-    //             name,
-    //             storage.get(`forecastWeather_${name}`)
-    //           )
-    //         );
-    //       });
-    //       setTimeout(() => {
-    //         qeuestWeather = false;
-    //       }, 1000 * 3);
-    //     } else if (message.length == 2 && locationNames.includes(message[0])) {
-    //       if (!qeuestWeather) {
-    //         qeuestWeather = true;
-    //         msg.channel.send(
-    //           await getShortTermLiveWeather(
-    //             message[0],
-    //             storage.get(`currentWeather_${message[0]}`)
-    //           )
-    //         );
-    //         msg.channel.send(
-    //           await getShortTermForecastWeather(
-    //             message[0],
-    //             storage.get(`forecastWeather_${message[0]}`)
-    //           )
-    //         );
-    //         setTimeout(() => {
-    //           qeuestWeather = false;
-    //         }, 1000 * 1);
-    //       } else {
-    //         msg.reply("천천히 물어봐..");
-    //       }
-    //     } else {
-    //       msg.reply(
-    //         "이렇게 입력해봐 >" + Object.keys(location).join(" 또는 ") + " 날씨"
-    //       );
-    //     }
-    //   } else {
-    //     msg.reply("천천히 물어봐..");
-    //   }
     } else if (
       [
         "!코로나",
@@ -266,7 +169,7 @@ client.on("messageCreate", async (msg) => {
                   `./static/musics/방송켜줘.mp3`,
                   { seek: 0, volume: 0.8 }
                 );
-                dispatcher.on("end", (end) => {});
+                dispatcher.on("end", (end) => { });
               })
               .catch(console.error);
           } else {
@@ -282,7 +185,7 @@ client.on("messageCreate", async (msg) => {
                   seek: 0,
                   volume: 0.2,
                 });
-                dispatcher.on("end", (end) => {});
+                dispatcher.on("end", (end) => { });
               })
               .catch(console.error);
           } else {
@@ -296,20 +199,6 @@ client.on("messageCreate", async (msg) => {
       if (msg.member.voice.channel) {
         msg.member.voice.channel.leave();
       }
-      // 네이버 실검 삭제
-      // } else if (
-      //   msg.content === "!네이버실검" ||
-      //   msg.content === "!실시간" ||
-      //   msg.content === "!실검" ||
-      //   msg.content === "!실시간검색어"
-      // ) {
-      //   naverRankingInfo().then((values) => {
-      //     let messages = ["-----네이버 실시간 Top20-----"];
-      //     values.forEach((v) => {
-      //       messages.push(`${v.rank}위 : ${v.title}`);
-      //     });
-      //     msg.channel.send(messages.join("\n"));
-      //   });
     } else if (msg.content === "!링크" || msg.content === "!최근링크") {
       db.SearchLink(msg);
     } else if (msg.content.startsWith("!롤전적")) {
@@ -340,19 +229,6 @@ client.on("messageCreate", async (msg) => {
             } else {
               message.push("Unranked");
             }
-
-            // await lolSummonerInfo.dynamicCrawling(summoner.summonerName)
-            // .then(ingame => {
-            //     message.push("===== 인게임 정보 =====")
-            //     if(ingame.isInGame){
-            //         message.push(`블루팀 정보`);
-            //         message.push(`레드팀 정보`);
-            //     }else{
-            //         message.push("현재 게임을 하고 있지 않습니다.")
-            //     }
-            //     return ingame;
-            // }).then(value=> console.log(value));
-
             message.push("```");
             msg.channel.send(message.join("\n"));
           } else {
