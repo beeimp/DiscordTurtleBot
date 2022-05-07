@@ -1,7 +1,6 @@
 
-module.exports = async(client, interaction) => {
+module.exports = async(interaction) => {
   const {commandName, options} = interaction;
-  console.log(options);
   switch(commandName){
     case 'ping':
       await interaction.reply({
@@ -34,7 +33,6 @@ module.exports = async(client, interaction) => {
       break;
     case '삭제':
       const num = options.getInteger('number');
-      console.log("num :", num);
       interaction.channel.bulkDelete(num > 100 ? 100 : num);
       await interaction.reply({
         content: `${num > 100 ? 100 : num}개의 메세지를 지웠어!`,
